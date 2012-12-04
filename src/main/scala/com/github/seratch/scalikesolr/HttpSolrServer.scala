@@ -19,7 +19,11 @@ package com.github.seratch.scalikesolr
 import java.net.URL
 import util.Log
 
-class HttpSolrServer(val url: URL, val keyStoreFile:String=None, val keystorePassword:String=None) {
+class HttpSolrServer(val url: URL, val keyStoreFile: String, val keystorePassword: String) {
+
+  def this(url: URL) = {
+    this(url, null, null)
+  }
 
   def newClient(): SolrClient = new HttpSolrClient(url)
 
@@ -49,8 +53,8 @@ class HttpSolrServer(val url: URL, val keyStoreFile:String=None, val keystorePas
       connectTimeout = connectTimeout,
       readTimeout = readTimeout,
       log = log,
-      keyStoreFile = keyStoreFile,
-      keystorePassword = keystorePassword
+      keyStoreFile = null,
+      keystorePassword = null
     )
   }
 

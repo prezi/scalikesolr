@@ -23,7 +23,8 @@ import collection.JavaConverters._
 import org.apache.solr.common.util.{ NamedList, JavaBinCodec }
 import reflect.BeanProperty
 import org.slf4j.LoggerFactory
-import javax.net.ssl.{SSLSocketFactory, HttpsURLConnection}
+import javax.net.ssl.{ SSLSocketFactory, HttpsURLConnection, SSLContext, TrustManagerFactory }
+import java.security.KeyStore
 
 object HttpClient {
   val DEFAULT_CONNECT_TIMEOUT_MILLIS = 3000
@@ -31,43 +32,38 @@ object HttpClient {
 }
 
 class HttpClient(@BeanProperty val connectTimeout: Int = HttpClient.DEFAULT_CONNECT_TIMEOUT_MILLIS,
-    @BeanProperty val readTimeout: Int = HttpClient.DEFAULT_READ_TIMEOUT_MILLIS,
-    @BeanProperty val keyStoreFile: String, @BeanProperty val keyStorePassword: String) {
+                 @BeanProperty val readTimeout: Int = HttpClient.DEFAULT_READ_TIMEOUT_MILLIS,
+                 @BeanProperty val keyStoreFile: String = null, @BeanProperty val keyStorePassword: String = null) {
 
-
-  def this(connectTimeout: Int, readTimeout: Int) = {
-    this(connectTimeout, readTimeout, null, null)
-  }
-
-  val sslsocketfactory:SSLSocketFactory = createSocketFactory(keyStoreFile, keyStorePassword)
+  val sslsocketfactory: SSLSocketFactory = createSocketFactory(keyStoreFile, keyStorePassword)
 
   val log: Log = new Log(LoggerFactory.getLogger(classOf[HttpClient].getCanonicalName))
 
-  def createSocketFactory(keyStoreFile:String, keyStorePassword:String):SSLSocketFactory = {
-    if (keyStoreFile!=null){
-      val keyStore:KeyStore = KeyStore.getInstance("JKS")
-      keyStore.load(new java.io.FileInputStream(keyStoreFile), keyStorePassword)
-      trustStore.close()
-      val tmf:TrustManagerFactory = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm())
+  def createSocketFactory(keyStoreFile: String, keyStorePassword: String): SSLSocketFactory = {
+    if (keyStoreFile != null) {
+      val keyStore: KeyStore = TrustStore.getInstance("JKS")
+      val keyStoreContentStream = new java.io.FileInputStream(keyStoreFile)
+      keyStore.load(keyStoreContentStream, keyStorePassword)
+      keyStoreContentStream.close()
+      val tmf: TrustManagerFactory = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm())
       tmf.init(keyStore)
-      val ctx:SSLContext = SSLContext.getInstance("TLS")
+      val ctx: SSLContext = SSLContext.getInstance("TLS")
       ctx.init(null, tmf.getTrustManagers(), null)
-      val socketFactory=ctx.getSocketFactory()
-      return socketFactory
+      val factory = ctx.getSocketFactory()
+      factory
     }
-    return null
   }
 
   def getAsJavabin(urlString: String): JavabinHttpResponse = {
-    val url = URL(urlString)
-    val conn = if (url.getProtocol == "http") {
-      new url.openConnection().asInstanceOf[HttpURLConnection]
-    } else {
-      sslConn = new url.openConnection().asInstanceOf[HttpsURLConnection]
-      if (sslsocketfactory!=null){
-        sslConn.setSSLSocketFactory(sslsocketfactory)
+    val url = new URL(urlString)
+    val conn = if (url.getProtocol == "https") {
+      val sslConnn = url.openConnection().asInstanceOf[HttpsURLConnection]
+      if (sslsocketfactory != null) {
+        sslConnn.setSSLSocketFactory(sslsocketfactory)
       }
-      sslConn
+      sslConnn
+    } else {
+      url.openConnection().asInstanceOf[HttpURLConnection]
     }
     conn.setConnectTimeout(connectTimeout)
     conn.setReadTimeout(readTimeout)
