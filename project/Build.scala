@@ -9,7 +9,7 @@ object ScalikeSolrBuild extends Build {
     sbtPlugin := false,
     organization := "com.github.seratch",
     name := "scalikesolr",
-    version := "4.0.0",
+    version := "4.0.0_prezi",
     scalaVersion := "2.9.2",
     crossScalaVersions := Seq("2.9.2", "2.9.1"),
     libraryDependencies <++= (scalaVersion) { scalaVersion =>
