@@ -27,7 +27,8 @@ class HttpSolrClient(@BeanProperty val url: URL,
     @BeanProperty val connectTimeout: Int = HttpClient.DEFAULT_CONNECT_TIMEOUT_MILLIS,
     @BeanProperty val readTimeout: Int = HttpClient.DEFAULT_READ_TIMEOUT_MILLIS,
     @BeanProperty val log: Log = new Log(LoggerFactory.getLogger(classOf[HttpSolrClient].getCanonicalName)),
-    @BeanProperty val keyStoreFile: String = None) extends SolrClient {
+    @BeanProperty val keyStoreFile: String = None,
+    @BeanProperty val keystorePassword: String = None) extends SolrClient {
 
   def this(url: URL, log: Log) = {
     this(
@@ -35,7 +36,9 @@ class HttpSolrClient(@BeanProperty val url: URL,
       connectTimeout = HttpClient.DEFAULT_CONNECT_TIMEOUT_MILLIS,
       readTimeout = HttpClient.DEFAULT_READ_TIMEOUT_MILLIS,
       log = log,
-      keyStoreFile = None
+      keyStoreFile = None,
+      keystorePassword = None
+
     )
   }
 
@@ -45,7 +48,9 @@ class HttpSolrClient(@BeanProperty val url: URL,
       connectTimeout = HttpClient.DEFAULT_CONNECT_TIMEOUT_MILLIS,
       readTimeout = HttpClient.DEFAULT_READ_TIMEOUT_MILLIS,
       log = log,
-      keyStoreFile = keyStoreFile
+      keyStoreFile = keyStoreFile,
+      keystorePassword = keystorePassword
+
     )
   }
 

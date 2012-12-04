@@ -29,7 +29,9 @@ class HttpSolrServer(val url: URL, val keyStoreFile:String=None, val keystorePas
     new HttpSolrClient(
       url = url,
       connectTimeout = connectTimeout,
-      readTimeout = readTimeout
+      readTimeout = readTimeout,
+      keyStoreFile = keyStoreFile,
+      keystorePassword = keystorePassword
     )
   }
 
@@ -46,7 +48,9 @@ class HttpSolrServer(val url: URL, val keyStoreFile:String=None, val keystorePas
       url = url,
       connectTimeout = connectTimeout,
       readTimeout = readTimeout,
-      log = log
+      log = log,
+      keyStoreFile = keyStoreFile,
+      keystorePassword = keystorePassword
     )
   }
 
