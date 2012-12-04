@@ -24,11 +24,11 @@ import util.{ Log, XMLStringBuilder }
 import com.github.seratch.scalikesolr.HttpSolrClient
 
 class HttpSolrClient(@BeanProperty val url: URL,
-    @BeanProperty val connectTimeout: Int = HttpClient.DEFAULT_CONNECT_TIMEOUT_MILLIS,
-    @BeanProperty val readTimeout: Int = HttpClient.DEFAULT_READ_TIMEOUT_MILLIS,
-    @BeanProperty val log: Log = new Log(LoggerFactory.getLogger(classOf[HttpSolrClient].getCanonicalName)),
-    @BeanProperty val keyStoreFile: String,
-    @BeanProperty val keystorePassword: String) extends SolrClient {
+                     @BeanProperty val connectTimeout: Int = HttpClient.DEFAULT_CONNECT_TIMEOUT_MILLIS,
+                     @BeanProperty val readTimeout: Int = HttpClient.DEFAULT_READ_TIMEOUT_MILLIS,
+                     @BeanProperty val log: Log = new Log(LoggerFactory.getLogger(classOf[HttpSolrClient].getCanonicalName)),
+                     @BeanProperty val keyStoreFile: String = null,
+                     @BeanProperty val keyStorePassword: String = null) extends SolrClient {
 
   def this(url: URL, log: Log) = {
     this(
@@ -37,23 +37,22 @@ class HttpSolrClient(@BeanProperty val url: URL,
       readTimeout = HttpClient.DEFAULT_READ_TIMEOUT_MILLIS,
       log = log,
       keyStoreFile = null,
-      keystorePassword = null
+      keyStorePassword = null
 
     )
   }
 
-  def this(url: URL, log: Log, keyStoreFile:String, keystorePassword:String) = {
+  def this(url: URL, log: Log, keyStoreFile:String, keyStorePassword:String) = {
     this(
       url = url,
       connectTimeout = HttpClient.DEFAULT_CONNECT_TIMEOUT_MILLIS,
       readTimeout = HttpClient.DEFAULT_READ_TIMEOUT_MILLIS,
       log = log,
       keyStoreFile = keyStoreFile,
-      keystorePassword = keystorePassword
+      keyStorePassword = keyStorePassword
 
     )
   }
-
 
   private val LOG_PREFIX = "["
   private val LOG_PREFIX_URL = "URL: "
