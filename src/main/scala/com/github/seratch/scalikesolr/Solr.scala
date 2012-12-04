@@ -22,6 +22,8 @@ object Solr {
 
   def httpServer(url: URL): HttpSolrServer = new HttpSolrServer(url)
 
+  def httpsServer(url: URL, keyStoreFile:String, keystorePassword:String): HttpSolrServer = new HttpSolrServer(url, keyStoreFile, keystorePassword)
+
   def getHttpServer(url: URL): HttpSolrServer = httpServer(url)
 
 }

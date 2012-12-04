@@ -27,7 +27,7 @@ class HttpSolrClient(@BeanProperty val url: URL,
     @BeanProperty val connectTimeout: Int = HttpClient.DEFAULT_CONNECT_TIMEOUT_MILLIS,
     @BeanProperty val readTimeout: Int = HttpClient.DEFAULT_READ_TIMEOUT_MILLIS,
     @BeanProperty val log: Log = new Log(LoggerFactory.getLogger(classOf[HttpSolrClient].getCanonicalName)),
-    @BeanProperty val clientSslKeyFile: String = None) extends SolrClient {
+    @BeanProperty val keyStoreFile: String = None) extends SolrClient {
 
   def this(url: URL, log: Log) = {
     this(
@@ -35,17 +35,17 @@ class HttpSolrClient(@BeanProperty val url: URL,
       connectTimeout = HttpClient.DEFAULT_CONNECT_TIMEOUT_MILLIS,
       readTimeout = HttpClient.DEFAULT_READ_TIMEOUT_MILLIS,
       log = log,
-      clientSslKeyFile = None
+      keyStoreFile = None
     )
   }
 
-  def this(url: URL, log: Log, clientSslKeyFile:String) = {
+  def this(url: URL, log: Log, keyStoreFile:String) = {
     this(
       url = url,
       connectTimeout = HttpClient.DEFAULT_CONNECT_TIMEOUT_MILLIS,
       readTimeout = HttpClient.DEFAULT_READ_TIMEOUT_MILLIS,
       log = log,
-      clientSslKeyFile = clientSslKeyFile
+      keyStoreFile = keyStoreFile
     )
   }
 
@@ -59,7 +59,7 @@ class HttpSolrClient(@BeanProperty val url: URL,
   private val CONTENT_TYPE_XML = "text/xml"
   private val UTF8 = "UTF-8"
 
-  private def httpClient: HttpClient = new HttpClient(connectTimeout, readTimeout, clientSslKeyFile)
+  private def httpClient: HttpClient = new HttpClient(connectTimeout, readTimeout, keyStoreFile, keyStorePassword)
 
   private def basicUrl(core: SolrCore): String = {
     val coreName = if (core.name.isEmpty) "" else "/" + core.name

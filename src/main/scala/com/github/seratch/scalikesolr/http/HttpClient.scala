@@ -32,23 +32,28 @@ object HttpClient {
 
 class HttpClient(@BeanProperty val connectTimeout: Int = HttpClient.DEFAULT_CONNECT_TIMEOUT_MILLIS,
     @BeanProperty val readTimeout: Int = HttpClient.DEFAULT_READ_TIMEOUT_MILLIS,
-    @BeanProperty val clientSslKeyFile: String = None) {
+    @BeanProperty val keyStoreFile: String = None, @BeanProperty val keyStorePassword: String = None) {
 
 
 
-  val sslsocketfactory:SSLSocketFactory = createSocketFactory()
+  val sslsocketfactory:SSLSocketFactory = createSocketFactory(keyStoreFile, keyStorePassword)
 
   val log: Log = new Log(LoggerFactory.getLogger(classOf[HttpClient].getCanonicalName))
 
   def createSocketFactory(keyStoreFile:String, keyStorePassword:String):SSLSocketFactory = {
-    val keyStore:KeyStore = KeyStore.getInstance("JKS")
-    keyStore.load(new java.io.FileInputStream(keyStoreFile), keyStorePassword)
-    trustStore.close()
-    val tmf:TrustManagerFactory = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm())
-    tmf.init(keyStore)
-    val ctx:SSLContext = SSLContext.getInstance("TLS")
-    ctx.init(null, tmf.getTrustManagers(), null)
-    ctx.getSocketFactory()
+    match keyStoreFile {
+      case keyStoreFile:String => {
+        val keyStore:KeyStore = KeyStore.getInstance("JKS")
+        keyStore.load(new java.io.FileInputStream(keyStoreFile), keyStorePassword)
+        trustStore.close()
+        val tmf:TrustManagerFactory = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm())
+        tmf.init(keyStore)
+        val ctx:SSLContext = SSLContext.getInstance("TLS")
+        ctx.init(null, tmf.getTrustManagers(), null)
+        ctx.getSocketFactory()
+      }
+      case None => None
+    }
   }
 
   def getAsJavabin(urlString: String): JavabinHttpResponse = {
@@ -57,8 +62,8 @@ class HttpClient(@BeanProperty val connectTimeout: Int = HttpClient.DEFAULT_CONN
       new url.openConnection().asInstanceOf[HttpURLConnection]
     } else {
       new url.openConnection().asInstanceOf[HttpsURLConnection]
-      clientSslKeyFile match {
-        case clientSslKeyFile:String => {
+      sslsocketfactory match {
+        case SSLSocketFactory => {
           conn.setSSLSocketFactory(sslsocketfactory)
         }
       }
