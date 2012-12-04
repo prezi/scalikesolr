@@ -43,7 +43,7 @@ class HttpClient(@BeanProperty val connectTimeout: Int = HttpClient.DEFAULT_CONN
     if (keyStoreFile != null) {
       val keyStore: KeyStore = KeyStore.getInstance("JKS")
       val keyStoreContentStream = new java.io.FileInputStream(keyStoreFile)
-      keyStore.load(keyStoreContentStream, keyStorePassword)
+      keyStore.load(keyStoreContentStream, keyStorePassword.toCharArray())
       keyStoreContentStream.close()
       val tmf: TrustManagerFactory = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm())
       tmf.init(keyStore)
