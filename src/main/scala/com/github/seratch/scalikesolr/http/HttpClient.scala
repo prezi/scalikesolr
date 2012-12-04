@@ -23,6 +23,7 @@ import collection.JavaConverters._
 import org.apache.solr.common.util.{ NamedList, JavaBinCodec }
 import reflect.BeanProperty
 import org.slf4j.LoggerFactory
+import javax.net.ssl.{SSLSocketFactory, HttpsURLConnection}
 
 object HttpClient {
   val DEFAULT_CONNECT_TIMEOUT_MILLIS = 3000
@@ -30,12 +31,38 @@ object HttpClient {
 }
 
 class HttpClient(@BeanProperty val connectTimeout: Int = HttpClient.DEFAULT_CONNECT_TIMEOUT_MILLIS,
-    @BeanProperty val readTimeout: Int = HttpClient.DEFAULT_READ_TIMEOUT_MILLIS) {
+    @BeanProperty val readTimeout: Int = HttpClient.DEFAULT_READ_TIMEOUT_MILLIS,
+    @BeanProperty val clientSslKeyFile: String = None) {
+
+
+
+  val sslsocketfactory:SSLSocketFactory = createSocketFactory()
 
   val log: Log = new Log(LoggerFactory.getLogger(classOf[HttpClient].getCanonicalName))
 
-  def getAsJavabin(url: String): JavabinHttpResponse = {
-    val conn = new URL(url).openConnection().asInstanceOf[HttpURLConnection];
+  def createSocketFactory(keyStoreFile:String, keyStorePassword:String):SSLSocketFactory = {
+    val keyStore:KeyStore = KeyStore.getInstance("JKS")
+    keyStore.load(new java.io.FileInputStream(keyStoreFile), keyStorePassword)
+    trustStore.close()
+    val tmf:TrustManagerFactory = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm())
+    tmf.init(keyStore)
+    val ctx:SSLContext = SSLContext.getInstance("TLS")
+    ctx.init(null, tmf.getTrustManagers(), null)
+    ctx.getSocketFactory()
+  }
+
+  def getAsJavabin(urlString: String): JavabinHttpResponse = {
+    val url = URL(urlString)
+    val conn = if (url.getProtocol == "http") {
+      new url.openConnection().asInstanceOf[HttpURLConnection]
+    } else {
+      new url.openConnection().asInstanceOf[HttpsURLConnection]
+      clientSslKeyFile match {
+        case clientSslKeyFile:String => {
+          conn.setSSLSocketFactory(sslsocketfactory)
+        }
+      }
+    }
     conn.setConnectTimeout(connectTimeout)
     conn.setReadTimeout(readTimeout)
     conn.setRequestMethod("GET")

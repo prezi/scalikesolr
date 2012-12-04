@@ -21,20 +21,34 @@ import java.net.URL
 import reflect.BeanProperty
 import org.slf4j.LoggerFactory
 import util.{ Log, XMLStringBuilder }
+import com.github.seratch.scalikesolr.HttpSolrClient
 
 class HttpSolrClient(@BeanProperty val url: URL,
     @BeanProperty val connectTimeout: Int = HttpClient.DEFAULT_CONNECT_TIMEOUT_MILLIS,
     @BeanProperty val readTimeout: Int = HttpClient.DEFAULT_READ_TIMEOUT_MILLIS,
-    @BeanProperty val log: Log = new Log(LoggerFactory.getLogger(classOf[HttpSolrClient].getCanonicalName))) extends SolrClient {
+    @BeanProperty val log: Log = new Log(LoggerFactory.getLogger(classOf[HttpSolrClient].getCanonicalName)),
+    @BeanProperty val clientSslKeyFile: String = None) extends SolrClient {
 
   def this(url: URL, log: Log) = {
     this(
       url = url,
       connectTimeout = HttpClient.DEFAULT_CONNECT_TIMEOUT_MILLIS,
       readTimeout = HttpClient.DEFAULT_READ_TIMEOUT_MILLIS,
-      log = log
+      log = log,
+      clientSslKeyFile = None
     )
   }
+
+  def this(url: URL, log: Log, clientSslKeyFile:String) = {
+    this(
+      url = url,
+      connectTimeout = HttpClient.DEFAULT_CONNECT_TIMEOUT_MILLIS,
+      readTimeout = HttpClient.DEFAULT_READ_TIMEOUT_MILLIS,
+      log = log,
+      clientSslKeyFile = clientSslKeyFile
+    )
+  }
+
 
   private val LOG_PREFIX = "["
   private val LOG_PREFIX_URL = "URL: "
@@ -45,7 +59,7 @@ class HttpSolrClient(@BeanProperty val url: URL,
   private val CONTENT_TYPE_XML = "text/xml"
   private val UTF8 = "UTF-8"
 
-  private def httpClient: HttpClient = new HttpClient(connectTimeout, readTimeout)
+  private def httpClient: HttpClient = new HttpClient(connectTimeout, readTimeout, clientSslKeyFile)
 
   private def basicUrl(core: SolrCore): String = {
     val coreName = if (core.name.isEmpty) "" else "/" + core.name
