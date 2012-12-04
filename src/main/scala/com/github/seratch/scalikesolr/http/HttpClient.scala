@@ -50,8 +50,9 @@ class HttpClient(@BeanProperty val connectTimeout: Int = HttpClient.DEFAULT_CONN
       val ctx: SSLContext = SSLContext.getInstance("TLS")
       ctx.init(null, tmf.getTrustManagers(), null)
       val factory = ctx.getSocketFactory()
-      factory
+      return factory
     }
+    return null
   }
 
   def getAsJavabin(urlString: String): JavabinHttpResponse = {
