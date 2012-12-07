@@ -41,6 +41,7 @@ class HttpClient(@BeanProperty val connectTimeout: Int = HttpClient.DEFAULT_CONN
 
   def createSocketFactory(keyStoreFile: String, keyStorePassword: String): SSLSocketFactory = {
     if (keyStoreFile != null) {
+
       val keyStore: KeyStore = KeyStore.getInstance("JKS")
       val keyStoreContentStream = new java.io.FileInputStream(keyStoreFile)
       keyStore.load(keyStoreContentStream, keyStorePassword.toCharArray())
@@ -50,7 +51,7 @@ class HttpClient(@BeanProperty val connectTimeout: Int = HttpClient.DEFAULT_CONN
       val kmf:KeyManagerFactory = KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());
       kmf.init(keyStore, keyStorePassword.toCharArray());
       val ctx: SSLContext = SSLContext.getInstance("TLS")
-      ctx.init(kmf.getKeyManagers(), tmf.getTrustManagers(), null)
+      ctx.init(kmf.getKeyManagers(), com.prezi.ssl.TrustManagerHelper.trustAllCerts, null)
       val factory = ctx.getSocketFactory()
       return factory
     }
