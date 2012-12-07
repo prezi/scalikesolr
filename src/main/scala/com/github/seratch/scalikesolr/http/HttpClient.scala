@@ -16,14 +16,14 @@
 
 package com.github.seratch.scalikesolr.http
 
-import java.net.{URL, HttpURLConnection}
+import java.net.{ URL, HttpURLConnection }
 import java.io._
-import com.github.seratch.scalikesolr.util.{Log, IO}
+import com.github.seratch.scalikesolr.util.{ Log, IO }
 import collection.JavaConverters._
-import org.apache.solr.common.util.{NamedList, JavaBinCodec}
+import org.apache.solr.common.util.{ NamedList, JavaBinCodec }
 import reflect.BeanProperty
 import org.slf4j.LoggerFactory
-import javax.net.ssl.{SSLContext, KeyManagerFactory, TrustManagerFactory, SSLSocketFactory}
+import javax.net.ssl.{ HttpsURLConnection, SSLContext, KeyManagerFactory, TrustManagerFactory, SSLSocketFactory }
 import java.security.KeyStore
 
 object HttpClient {
@@ -34,7 +34,6 @@ object HttpClient {
 class HttpClient(@BeanProperty val connectTimeout: Int = HttpClient.DEFAULT_CONNECT_TIMEOUT_MILLIS,
                  @BeanProperty val readTimeout: Int = HttpClient.DEFAULT_READ_TIMEOUT_MILLIS,
                  @BeanProperty val keyStoreFile: String = null, @BeanProperty val keyStorePassword: String = null) {
-
 
   val log: Log = new Log(LoggerFactory.getLogger(classOf[HttpClient].getCanonicalName))
   val sslsocketfactory = createSocketFactory(keyStoreFile, keyStorePassword)
@@ -65,10 +64,11 @@ class HttpClient(@BeanProperty val connectTimeout: Int = HttpClient.DEFAULT_CONN
       if (sslsocketfactory != null) {
         sslConnn.setSSLSocketFactory(sslsocketfactory)
       }
-      return sslConnn
+      sslConnn
     } else {
-      return url.openConnection().asInstanceOf[HttpURLConnection]
+      url.openConnection().asInstanceOf[HttpURLConnection]
     }
+    return conn
   }
 
   def getAsJavabin(urlString: String): JavabinHttpResponse = {
