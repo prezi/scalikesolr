@@ -23,7 +23,7 @@ import collection.JavaConverters._
 import org.apache.solr.common.util.{ NamedList, JavaBinCodec }
 import reflect.BeanProperty
 import org.slf4j.LoggerFactory
-import javax.net.ssl.{ SSLSocketFactory, HttpsURLConnection, SSLContext, TrustManagerFactory }
+import javax.net.ssl.{ SSLSocketFactory, HttpsURLConnection, SSLContext, TrustManagerFactory, KeyManagerFactory }
 import java.security.KeyStore
 
 object HttpClient {
@@ -47,8 +47,10 @@ class HttpClient(@BeanProperty val connectTimeout: Int = HttpClient.DEFAULT_CONN
       keyStoreContentStream.close()
       val tmf: TrustManagerFactory = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm())
       tmf.init(keyStore)
+      val kmf:KeyManagerFactory = KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());
+      kmf.init(keyStore, keyStorePassword.toCharArray());
       val ctx: SSLContext = SSLContext.getInstance("TLS")
-      ctx.init(null, tmf.getTrustManagers(), null)
+      ctx.init(kmf.getKeyManagers(), tmf.getTrustManagers(), null)
       val factory = ctx.getSocketFactory()
       return factory
     }
