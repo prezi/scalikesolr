@@ -25,7 +25,7 @@ class HttpSolrServer(val url: URL, val keyStoreFile: String, val keyStorePasswor
     this(url, null, null)
   }
 
-  def newClient(): SolrClient = new HttpSolrClient(url)
+  def newClient(): SolrClient = new HttpSolrClient(url, keyStoreFile, keyStorePassword)
 
   def getNewClient(): SolrClient = newClient()
 
