@@ -58,7 +58,8 @@ class HttpClient(@BeanProperty val connectTimeout: Int = HttpClient.DEFAULT_CONN
     return null
   }
 
-  def createConnection(url: URL): HttpURLConnection = {
+  def createConnection(urlString: String): HttpURLConnection = {
+    val url = new URL(urlString)
     val conn = if (url.getProtocol == "https") {
       val sslConnn = url.openConnection().asInstanceOf[HttpsURLConnection]
       if (sslsocketfactory != null) {
@@ -71,8 +72,7 @@ class HttpClient(@BeanProperty val connectTimeout: Int = HttpClient.DEFAULT_CONN
     return conn
   }
 
-  def getAsJavabin(urlString: String): JavabinHttpResponse = {
-    val url = new URL(urlString)
+  def getAsJavabin(url: String): JavabinHttpResponse = {
     val conn = createConnection(url)
     conn.setConnectTimeout(connectTimeout)
     conn.setReadTimeout(readTimeout)
