@@ -16,14 +16,14 @@
 
 package com.github.seratch.scalikesolr.http
 
-import java.net.{ URL, HttpURLConnection }
+import java.net.{URL, HttpURLConnection}
 import java.io._
-import com.github.seratch.scalikesolr.util.{ Log, IO }
+import com.github.seratch.scalikesolr.util.{Log, IO}
 import collection.JavaConverters._
-import org.apache.solr.common.util.{ NamedList, JavaBinCodec }
+import org.apache.solr.common.util.{NamedList, JavaBinCodec}
 import reflect.BeanProperty
 import org.slf4j.LoggerFactory
-import javax.net.ssl.{ SSLSocketFactory, HttpsURLConnection, SSLContext, TrustManagerFactory, KeyManagerFactory }
+import javax.net.ssl.{SSLContext, KeyManagerFactory, TrustManagerFactory, SSLSocketFactory}
 import java.security.KeyStore
 
 object HttpClient {
@@ -35,16 +35,15 @@ class HttpClient(@BeanProperty val connectTimeout: Int = HttpClient.DEFAULT_CONN
                  @BeanProperty val readTimeout: Int = HttpClient.DEFAULT_READ_TIMEOUT_MILLIS,
                  @BeanProperty val keyStoreFile: String = null, @BeanProperty val keyStorePassword: String = null) {
 
-  val sslsocketfactory: SSLSocketFactory = createSocketFactory(keyStoreFile, keyStorePassword)
 
   val log: Log = new Log(LoggerFactory.getLogger(classOf[HttpClient].getCanonicalName))
+  val sslsocketfactory = createSocketFactory(keyStoreFile, keyStorePassword)
 
   def createSocketFactory(keyStoreFile: String, keyStorePassword: String): SSLSocketFactory = {
     if (keyStoreFile != null) {
-
       val keyStore: KeyStore = KeyStore.getInstance("JKS")
       val trustStore: KeyStore = KeyStore.getInstance("JKS")
-      trustStore.load(new java.io.FileInputStream(keyStoreFile+".ca"),keyStorePassword.toCharArray())
+      trustStore.load(new java.io.FileInputStream(keyStoreFile + ".ca"), keyStorePassword.toCharArray())
       val keyStoreContentStream = new java.io.FileInputStream(keyStoreFile)
       keyStore.load(keyStoreContentStream, keyStorePassword.toCharArray())
       keyStoreContentStream.close()
@@ -60,17 +59,21 @@ class HttpClient(@BeanProperty val connectTimeout: Int = HttpClient.DEFAULT_CONN
     return null
   }
 
-  def getAsJavabin(urlString: String): JavabinHttpResponse = {
-    val url = new URL(urlString)
+  def createConnection(url: URL): HttpURLConnection = {
     val conn = if (url.getProtocol == "https") {
       val sslConnn = url.openConnection().asInstanceOf[HttpsURLConnection]
       if (sslsocketfactory != null) {
         sslConnn.setSSLSocketFactory(sslsocketfactory)
       }
-      sslConnn
+      return sslConnn
     } else {
-      url.openConnection().asInstanceOf[HttpURLConnection]
+      return url.openConnection().asInstanceOf[HttpURLConnection]
     }
+  }
+
+  def getAsJavabin(urlString: String): JavabinHttpResponse = {
+    val url = new URL(urlString)
+    val conn = createConnection(url)
     conn.setConnectTimeout(connectTimeout)
     conn.setReadTimeout(readTimeout)
     conn.setRequestMethod("GET")
@@ -95,7 +98,7 @@ class HttpClient(@BeanProperty val connectTimeout: Int = HttpClient.DEFAULT_CONN
 
   def get(url: String, charset: String): HttpResponse = {
 
-    val conn = new URL(url).openConnection().asInstanceOf[HttpURLConnection];
+    val conn = createConnection(url)
     conn.setConnectTimeout(connectTimeout)
     conn.setReadTimeout(readTimeout)
     conn.setRequestMethod("GET")
@@ -127,7 +130,7 @@ class HttpClient(@BeanProperty val connectTimeout: Int = HttpClient.DEFAULT_CONN
 
   def post(url: String, dataBinary: String, contentType: String, charset: String): HttpResponse = {
 
-    val conn = new URL(url).openConnection().asInstanceOf[HttpURLConnection];
+    val conn = createConnection(url)
     conn.setConnectTimeout(connectTimeout)
     conn.setReadTimeout(readTimeout)
     conn.setRequestMethod("POST")
