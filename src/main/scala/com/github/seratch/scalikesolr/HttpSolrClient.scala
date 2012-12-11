@@ -21,14 +21,13 @@ import java.net.URL
 import reflect.BeanProperty
 import org.slf4j.LoggerFactory
 import util.{ Log, XMLStringBuilder }
-import com.github.seratch.scalikesolr.HttpSolrClient
 
 class HttpSolrClient(@BeanProperty val url: URL,
-                     @BeanProperty val connectTimeout: Int = HttpClient.DEFAULT_CONNECT_TIMEOUT_MILLIS,
-                     @BeanProperty val readTimeout: Int = HttpClient.DEFAULT_READ_TIMEOUT_MILLIS,
-                     @BeanProperty val log: Log = new Log(LoggerFactory.getLogger(classOf[HttpSolrClient].getCanonicalName)),
-                     @BeanProperty val keyStoreFile: String = null,
-                     @BeanProperty val keyStorePassword: String = null) extends SolrClient {
+    @BeanProperty val connectTimeout: Int = HttpClient.DEFAULT_CONNECT_TIMEOUT_MILLIS,
+    @BeanProperty val readTimeout: Int = HttpClient.DEFAULT_READ_TIMEOUT_MILLIS,
+    @BeanProperty val log: Log = new Log(LoggerFactory.getLogger(classOf[HttpSolrClient].getCanonicalName)),
+    @BeanProperty val keyStoreFile: String = null,
+    @BeanProperty val keyStorePassword: String = null) extends SolrClient {
 
   def this(url: URL, log: Log) = {
     this(

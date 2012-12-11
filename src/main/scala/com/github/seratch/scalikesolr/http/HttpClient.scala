@@ -32,8 +32,8 @@ object HttpClient {
 }
 
 class HttpClient(@BeanProperty val connectTimeout: Int = HttpClient.DEFAULT_CONNECT_TIMEOUT_MILLIS,
-                 @BeanProperty val readTimeout: Int = HttpClient.DEFAULT_READ_TIMEOUT_MILLIS,
-                 @BeanProperty val keyStoreFile: String = null, @BeanProperty val keyStorePassword: String = null) {
+    @BeanProperty val readTimeout: Int = HttpClient.DEFAULT_READ_TIMEOUT_MILLIS,
+    @BeanProperty val keyStoreFile: String = null, @BeanProperty val keyStorePassword: String = null) {
 
   val log: Log = new Log(LoggerFactory.getLogger(classOf[HttpClient].getCanonicalName))
   val sslsocketfactory = createSocketFactory(keyStoreFile, keyStorePassword)

@@ -35,6 +35,7 @@ object ScalikeSolrBuild extends Build {
     scalacOptions ++= Seq("-deprecation", "-unchecked"),
     publishArtifact in Test := false,
     pomIncludeRepository := { x => false },
+    exportJars := true,
     pomExtra := (
       <url>http://github.com/scalikesolr</url>
       <licenses>
