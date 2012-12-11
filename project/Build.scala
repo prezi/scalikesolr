@@ -28,7 +28,7 @@ object ScalikeSolrBuild extends Build {
     externalResolvers ~= (_.filter(_.name != "Scala-Tools Maven2 Repository")),
     publishTo <<= version { (v: String) =>
       val nexus = "https://oss.sonatype.org/"
-        if (v.trim.endsWith("SNAPSHOT")) Some("snapshots" at nexus + "content/repositories/snapshots") 
+        if (v.trim.endsWith("SNAPSHOT")) Some("snapshots" at nexus + "content/repositories/snapshots")
         else Some("releases"  at nexus + "service/local/staging/deploy/maven2")
     },
     publishMavenStyle := true,
@@ -36,7 +36,7 @@ object ScalikeSolrBuild extends Build {
     publishArtifact in Test := false,
     pomIncludeRepository := { x => false },
     pomExtra := (
-      <url>http://seratch.github.com/scalikesolr</url>
+      <url>http://github.com/scalikesolr</url>
       <licenses>
         <license>
           <name>Apache License, Version 2.0</name>
@@ -45,8 +45,8 @@ object ScalikeSolrBuild extends Build {
         </license>
       </licenses>
       <scm>
-        <url>git@github.com:seratch/scalikesolr.git</url>
-        <connection>scm:git:git@github.com:seratch/scalikesolr.git</connection>
+        <url>git@git://github.com/prezi/scalikesolr.git</url>
+        <connection>scm:git:git@github.com:prezi/scalikesolr.git</connection>
       </scm>
       <developers>
         <developer>
@@ -59,4 +59,3 @@ object ScalikeSolrBuild extends Build {
   )
 
 }
-

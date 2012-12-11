@@ -4,7 +4,7 @@
 
     <groupId>com.github.seratch</groupId>
     <artifactId>scalikesolr_${scala.version}</artifactId>
-    <version>4.0.0</version>
+    <version>4.0.0_prezi</version>
     <name>${project.artifactId}</name>
     <description>Solr Client library for Scala</description>
     <inceptionYear>2011</inceptionYear>
